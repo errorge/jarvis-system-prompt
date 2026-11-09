@@ -1,0 +1,20 @@
+{
+  "name": "jarvis-system-prompt",
+  "version": "0.2.0",
+  "type": "module",
+  "magpie": {
+    "middleware": "./jarvis.middleware.js",
+    "page": {
+      "title": "Jarvis",
+      "titles": { "zh": "贾维斯", "zh-TW": "賈維斯" },
+      "file": "page/index.html"
+    },
+    "options": {
+      "enabled": true,
+      "agents": ["claude", "zcode"],
+      "persona": "jarvis",
+      "security": "remove",
+      "minTools": 3
+    }
+  }
+}

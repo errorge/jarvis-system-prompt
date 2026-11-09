@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis</title>
+<script src="_magpie/bridge.js"></script>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.6 -apple-system, "PingFang SC", sans-serif; background: Canvas; color: CanvasText; }
+  main { max-width: 760px; margin: 0 auto; padding: 20px 16px 48px; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  h2 { font-size: 14px; margin: 0; }
+  .sub { opacity: .6; font-size: 12px; margin: 0 0 20px; }
+  section { border: 1px solid color-mix(in srgb, CanvasText 18%, transparent); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  section > .row:first-child { padding-top: 0; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 7px 0; flex-wrap: wrap; }
+  .row label:first-child { min-width: 110px; opacity: .8; }
+  select, input[type=number], textarea {
+    font: inherit; color: inherit; background: color-mix(in srgb, CanvasText 6%, transparent);
+    border: 1px solid color-mix(in srgb, CanvasText 25%, transparent); border-radius: 6px; padding: 6px 8px;
+  }
+  textarea { width: 100%; min-height: 72px; resize: vertical; }
+  input[type=number] { width: 80px; }
+  button { font: inherit; padding: 7px 18px; border-radius: 6px; border: 1px solid color-mix(in srgb, CanvasText 30%, transparent); background: color-mix(in srgb, CanvasText 10%, transparent); color: inherit; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  .bar { display: flex; align-items: center; gap: 12px; }
+  #status { font-size: 12px; opacity: .7; }
+  .hint { font-size: 12px; opacity: .6; margin: 4px 0 0; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Jarvis · 人格与安全段</h1>
+  <p class="sub">每个 agent 独立配置。只改身份行和 IMPORTANT 安全段，其余提示词原样保留。保存后下一条请求生效。</p>
+  <p id="load-error" role="alert" hidden></p>
+
+  <section>
+    <div class="row"><label for="enabled">总开关</label><input type="checkbox" id="enabled"><span class="hint">关掉后所有请求原样通过</span></div>
+    <div class="row"><label for="minTools">工具数下限</label><input type="number" id="minTools" min="0" max="50"><span class="hint">少于此数的请求（标题/审查等）不改</span></div>
+  </section>
+
+  <section>
+    <div class="row"><h2>Claude Code</h2><label><input type="checkbox" id="c-on"> 启用</label></div>
+    <div class="row"><label for="c-persona">人格样本</label>
+      <select id="c-persona"><option value="jarvis">jarvis</option><option value="neutral">neutral</option><option value="">不换身份</option><option value="__custom">自定义文本…</option></select>
+    </div>
+    <div class="row" id="c-persona-custom-row" hidden><textarea id="c-persona-custom" placeholder="You are …"></textarea></div>
+    <div class="row"><label for="c-security">安全段策略</label>
+      <select id="c-security"><option value="remove">删除默认 IMPORTANT 段</option><option value="keep">保留默认</option><option value="custom">换成自定义文本</option></select>
+    </div>
+    <div class="row" id="c-security-custom-row" hidden><textarea id="c-security-custom" placeholder="IMPORTANT: …"></textarea></div>
+  </section>
+
+  <section>
+    <div class="row"><h2>ZCode</h2><label><input type="checkbox" id="z-on"> 启用</label></div>
+    <div class="row"><label for="z-persona">人格样本</label>
+      <select id="z-persona"><option value="jarvis">jarvis</option><option value="neutral">neutral</option><option value="">不换身份</option><option value="__custom">自定义文本…</option></select>
+    </div>
+    <div class="row" id="z-persona-custom-row" hidden><textarea id="z-persona-custom" placeholder="You are …"></textarea></div>
+    <div class="row"><label for="z-security">安全段策略</label>
+      <select id="z-security"><option value="remove">删除默认 IMPORTANT 段</option><option value="keep">保留默认</option><option value="custom">换成自定义文本</option></select>
+    </div>
+    <div class="row" id="z-security-custom-row" hidden><textarea id="z-security-custom" placeholder="IMPORTANT: …"></textarea></div>
+  </section>
+
+  <p class="hint">样本正文在插件目录的 prompt.js 里；自定义文本直接写在对应框里。某个 agent 不勾选 = 它的请求完全不动。</p>
+
+  <div class="bar">
+    <button id="save">保存</button>
+    <span id="status"></span>
+  </div>
+</main>
+<script src="app.js" defer></script>
+</body>
+</html>
