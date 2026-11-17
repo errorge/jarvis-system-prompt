@@ -86,7 +86,7 @@ export function onRequest(body, ctx) {
     if (!body || typeof body !== "object") return
     const o = ctx?.options || {}
     if (o.enabled === false) return
-    const agents = Array.isArray(o.agents) && o.agents.length ? o.agents : ["claude", "zcode"]
+    const agents = Array.isArray(o.agents) && o.agents.length ? o.agents : ["claude", "zcode", "codex"]
     const agent = ctx?.agent
     if (!agents.includes(agent)) return
     if (perAgent(o, agent).enabled === false) return
@@ -99,7 +99,12 @@ export function onRequest(body, ctx) {
     } else if (ctx.protocol === "chat") {
       fixSystemMessages(body, fix)
     } else if (ctx.protocol === "responses") {
-      if (typeof body.instructions === "string") body.instructions = fix(body.instructions)
+      body.instructions = fixContent(body.instructions, fix)
+      if (Array.isArray(body.input)) {
+        for (const it of body.input) {
+          if (it && (it.role === "system" || it.role === "developer")) it.content = fixContent(it.content, fix)
+        }
+      }
     } else if (ctx.protocol === "gemini") {
       const key = body.systemInstruction !== undefined ? "systemInstruction" : "system_instruction"
       const cur = body[key]

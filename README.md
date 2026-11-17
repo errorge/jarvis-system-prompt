@@ -21,7 +21,7 @@ magpie plugin add "$(pwd)"        # 或手动
 
 | 项 | 默认 |
 |---|---|
-| 生效 agent | Claude Code、ZCode |
+| 生效 agent | Claude Code、ZCode、Codex |
 | 身份 | 换成 `You are Jarvis,Chinese name: 贾维斯.` |
 | 默认安全段（`IMPORTANT: …`） | 删除 |
 | 旁路请求（标题/审查/分类，工具数 < 3） | 原样放行，不改 |
@@ -47,7 +47,7 @@ magpie plugin options jarvis-system-prompt           # 看当前配置
 magpie plugin off jarvis-system-prompt               # 临时关闭（恢复原提示）
 magpie plugin on  jarvis-system-prompt               # 重新打开
 magpie plugin add "$(pwd)"                           # 改过代码/页面后重新加载
-node --test test.mjs                                 # 跑 24 条单元测试
+node --test test.mjs                                 # 跑 30 条单元测试
 ```
 
 ## 包内结构

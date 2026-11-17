@@ -66,6 +66,19 @@
     <div class="row" id="z-security-custom-row" hidden><textarea id="z-security-custom" placeholder="IMPORTANT: …"></textarea></div>
   </section>
 
+  <section>
+    <div class="row"><h2>Codex</h2><label><input type="checkbox" id="x-on"> 启用</label></div>
+    <div class="row"><label for="x-persona">人格样本</label>
+      <select id="x-persona"><option value="jarvis">jarvis</option><option value="neutral">neutral</option><option value="">不换身份</option><option value="__custom">自定义文本…</option></select>
+    </div>
+    <div class="row" id="x-persona-custom-row" hidden><textarea id="x-persona-custom" placeholder="You are …"></textarea></div>
+    <div class="row"><label for="x-security">安全段策略</label>
+      <select id="x-security"><option value="remove">删除默认 IMPORTANT 段</option><option value="keep">保留默认</option><option value="custom">换成自定义文本</option></select>
+    </div>
+    <div class="row" id="x-security-custom-row" hidden><textarea id="x-security-custom" placeholder="IMPORTANT: …"></textarea></div>
+    <p class="hint">Codex 原提示没有 IMPORTANT 段：remove/keep 无差别；要用自定义规范选 custom。</p>
+  </section>
+
   <p class="hint">样本正文在插件目录的 prompt.js 里；自定义文本直接写在对应框里。某个 agent 不勾选 = 它的请求完全不动。</p>
 
   <div class="bar">

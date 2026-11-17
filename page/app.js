@@ -2,7 +2,8 @@
   var $ = function (id) { return document.getElementById(id) }
   var AGENTS = [
     { id: "claude", p: "c" },
-    { id: "zcode", p: "z" }
+    { id: "zcode", p: "z" },
+    { id: "codex", p: "x" }
   ]
   var opts = {}
   var loaded = false
@@ -15,7 +16,7 @@
 
   function fillAgent(a) {
     var s = per(a.id)
-    var agents = Array.isArray(opts.agents) ? opts.agents : ["claude", "zcode"]
+    var agents = Array.isArray(opts.agents) ? opts.agents : ["claude", "zcode", "codex"]
     $(a.p + "-on").checked = agents.indexOf(a.id) >= 0 && s.enabled !== false
 
     var persona = typeof s.persona === "string" ? s.persona : (typeof opts.persona === "string" ? opts.persona : "jarvis")

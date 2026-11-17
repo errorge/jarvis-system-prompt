@@ -2,6 +2,8 @@ export const identities = [
   { agent: "claude", from: /You are Claude Code, Anthropic['’]s official CLI(?: tool)? for Claude\./g },
   { agent: "claude", from: /You are a Claude agent, built on Anthropic['’]s Claude Agent SDK\./g },
   { agent: "zcode", from: /You are ZCode, an interactive agent/g },
+  { agent: "codex", from: /You are a coding agent running in the Codex CLI, a terminal-based coding assistant\./g },
+  { agent: "codex", from: /You are Codex, an agent based on GPT-\d+\./g },
 ]
 
 export const samples = {

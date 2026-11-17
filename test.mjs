@@ -234,3 +234,68 @@ test("客户端把 system 发在两处: custom 仍只一份，另一处只删不
   assert.equal(all.split(spec).length - 1, 1)
   assert.ok(!all.includes("IMPORTANT: Assist"))
 })
+
+test("codex: 身份行替换（chat 协议）", () => {
+  const id = "You are a coding agent running in the Codex CLI, a terminal-based coding assistant."
+  const b = { tools: tools(20), messages: [{ role: "system", content: id + "\n\n# How you work" }] }
+  const out = onRequest(b, ctx({ agent: "codex", protocol: "chat" }))
+  assert.ok(out.messages[0].content.startsWith("You are Jarvis,Chinese name: 贾维斯."))
+  assert.ok(out.messages[0].content.includes("# How you work"))
+})
+
+test("codex: GPT 变体身份行", () => {
+  const b = { tools: tools(5), messages: [{ role: "system", content: "You are Codex, an agent based on GPT-6." }] }
+  const out = onRequest(b, ctx({ agent: "codex", protocol: "chat" }))
+  assert.equal(out.messages[0].content, "You are Jarvis,Chinese name: 贾维斯.")
+})
+
+test("codex: 原文无 IMPORTANT 时 custom 前置且仅一份（重复调用不叠加）", () => {
+  const spec = "# My Spec\nline one"
+  const options = { settings: { codex: { security: "custom", customSecurity: spec } } }
+  const id = "You are a coding agent running in the Codex CLI, a terminal-based coding assistant."
+  const b = { tools: tools(20), messages: [{ role: "system", content: id + "\n# How you work" }] }
+  onRequest(b, ctx({ agent: "codex", protocol: "chat", options }))
+  onRequest(b, ctx({ agent: "codex", protocol: "chat", options }))
+  assert.equal(b.messages[0].content.split(spec).length - 1, 1)
+  assert.ok(b.messages[0].content.startsWith(spec))
+})
+
+test("responses: instructions 为块数组也能替换", () => {
+  const b = {
+    tools: tools(6),
+    instructions: [{ type: "text", text: ID_CLAUDE + "\n" + SEC }],
+    input: [],
+  }
+  const out = onRequest(b, ctx({ protocol: "responses" }))
+  assert.ok(out.instructions[0].text.startsWith("You are Jarvis"))
+  assert.ok(!out.instructions[0].text.includes("IMPORTANT"))
+})
+
+test("responses: 系统内容在 input 的 system 条目里也能替换", () => {
+  const id = "You are a coding agent running in the Codex CLI, a terminal-based coding assistant."
+  const b = {
+    tools: tools(6),
+    input: [
+      { role: "system", content: [{ type: "input_text", text: id + "\n\n# How you work" }] },
+      { role: "user", content: [{ type: "input_text", text: "hi" }] },
+    ],
+  }
+  const out = onRequest(b, ctx({ agent: "codex", protocol: "responses" }))
+  assert.ok(out.input[0].content[0].text.startsWith("You are Jarvis"))
+  assert.ok(out.input[0].content[0].text.includes("# How you work"))
+})
+
+test("responses: instructions 为块数组时 custom 仍只一份", () => {
+  const spec = "# My Spec\nx"
+  const options = { settings: { codex: { security: "custom", customSecurity: spec } } }
+  const id = "You are a coding agent running in the Codex CLI, a terminal-based coding assistant."
+  const b = {
+    tools: tools(6),
+    instructions: [{ type: "text", text: id + "\n# How you work" }],
+    input: [{ role: "system", content: [{ type: "input_text", text: id + "\n# How you work" }] }],
+  }
+  onRequest(b, ctx({ agent: "codex", protocol: "responses", options }))
+  const a = b.instructions[0].text
+  const c = b.input[0].content[0].text
+  assert.equal(a.split(spec).length - 1 + (c.split(spec).length - 1), 1)
+})
