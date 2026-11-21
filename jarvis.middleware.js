@@ -70,13 +70,23 @@ function fixSystemMessages(body, fix) {
   for (const m of msgs) m.content = fixContent(m.content, fix)
 }
 
+// 工具不一定在顶层 tools：responses 的 additional_tools、chat 的会话中途工具
+// 都在消息里，只看顶层会把带工具的真诚对话误判成旁路请求
 function toolCount(body) {
   const tools = Array.isArray(body?.tools) ? body.tools : []
-  if (!tools.length) return 0
-  let n = tools.length
-  if (tools[0] && Array.isArray(tools[0].functionDeclarations)) {
-    n = 0
+  let n = 0
+  if (tools.length && Array.isArray(tools[0]?.functionDeclarations)) {
     for (const t of tools) n += t && Array.isArray(t.functionDeclarations) ? t.functionDeclarations.length : 0
+  } else {
+    n = tools.length
+  }
+  if (Array.isArray(body?.input)) {
+    for (const it of body.input) {
+      if (it && it.type === "additional_tools" && Array.isArray(it.tools)) n += it.tools.length
+    }
+  }
+  if (Array.isArray(body?.messages)) {
+    for (const m of body.messages) if (m && Array.isArray(m.tools)) n += m.tools.length
   }
   return n
 }

@@ -299,3 +299,28 @@ test("responses: instructions 为块数组时 custom 仍只一份", () => {
   const c = b.input[0].content[0].text
   assert.equal(a.split(spec).length - 1 + (c.split(spec).length - 1), 1)
 })
+
+test("responses: 工具只在 input 的 additional_tools 里也算数（Codex Desktop）", () => {
+  const id = "You are Codex, an agent based on GPT-6."
+  const b = {
+    input: [
+      { type: "additional_tools", role: "developer", tools: tools(6) },
+      { role: "developer", content: [{ type: "input_text", text: id + "\n\n# How you work" }] },
+      { role: "user", content: [{ type: "input_text", text: "hi" }] },
+    ],
+  }
+  const out = onRequest(b, ctx({ agent: "codex", protocol: "responses" }))
+  assert.ok(out.input[1].content[0].text.startsWith("You are Jarvis"))
+  assert.ok(out.input[1].content[0].text.includes("# How you work"))
+})
+
+test("chat: 工具只在消息的 tools 里也算数", () => {
+  const b = {
+    messages: [
+      { role: "system", content: ID_CLAUDE + "\n# How you work", tools: tools(4) },
+      { role: "user", content: "hi" },
+    ],
+  }
+  const out = onRequest(b, ctx({ agent: "claude", protocol: "chat" }))
+  assert.ok(out.messages[0].content.startsWith("You are Jarvis"))
+})
